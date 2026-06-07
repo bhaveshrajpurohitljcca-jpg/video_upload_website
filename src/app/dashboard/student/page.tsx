@@ -89,7 +89,7 @@ export default function StudentDashboard() {
     tempVideo.src = objectUrl;
     tempVideo.preload = 'metadata';
     tempVideo.onloadedmetadata = () => {
-      if (tempVideo.duration > 60) {
+      if (tempVideo.duration > 180) {
         toast.error(`Video duration (${tempVideo.duration.toFixed(1)}s) exceeds the 1-minute limit.`);
         setVideoFile(null);
         setVideoPreviewUrl('');

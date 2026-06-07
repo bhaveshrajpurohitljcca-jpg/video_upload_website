@@ -642,7 +642,7 @@ export const db = {
         password: passwordHash
       });
       if (error) throw new Error(error.message);
-      return { id: data.user.id, email: data.user.email };
+      return await this.getCurrentUser();
     }
 
     const users = getStorageItem<any[]>('comp_users', [

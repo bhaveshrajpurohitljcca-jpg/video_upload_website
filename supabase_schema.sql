@@ -176,12 +176,20 @@ insert into public.competition_settings (id, submission_deadline, voting_deadlin
 values (1, '2026-06-07 20:30:00+05:30', '2026-06-08 08:30:00+05:30', 50, 1, 100, 3, 30, 70)
 on conflict (id) do nothing;
 
--- RLS Policies (Example setup - in real env, configure specific SELECT/INSERT/UPDATE rules)
--- For simplicity, let public read settings, themes, submissions, and vote counts.
-create policy "Allow public select settings" on public.competition_settings for select using (true);
-create policy "Allow public select themes" on public.themes for select using (true);
-create policy "Allow public select submissions" on public.submissions for select using (true);
-create policy "Allow public select votes" on public.votes for select using (true);
-create policy "Allow public select student_profiles" on public.student_profiles for select using (true);
-create policy "Allow public select judges" on public.judges for select using (true);
-create policy "Allow public select users" on public.users for select using (true);
+-- Insert default themes
+insert into public.themes (id, name, active) values
+  ('theme-creative-ads', 'Creative Ads', true),
+  ('theme-product-review', 'Product Review', true),
+  ('theme-tech-showcase', 'Tech Showcase', true),
+  ('theme-short-film', 'Short Film', true)
+on conflict (id) do nothing;
+
+-- RLS Policies (Configured for full access so client-side mutations work seamlessly)
+create policy "Allow all settings" on public.competition_settings for all using (true) with check (true);
+create policy "Allow all themes" on public.themes for all using (true) with check (true);
+create policy "Allow all submissions" on public.submissions for all using (true) with check (true);
+create policy "Allow all votes" on public.votes for all using (true) with check (true);
+create policy "Allow all student_profiles" on public.student_profiles for all using (true) with check (true);
+create policy "Allow all judges" on public.judges for all using (true) with check (true);
+create policy "Allow all users" on public.users for all using (true) with check (true);
+create policy "Allow all judge_scores" on public.judge_scores for all using (true) with check (true);

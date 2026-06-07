@@ -60,18 +60,7 @@ export default function LoginPage() {
     }, 1500);
   };
 
-  const fillRole = (role: 'student' | 'judge' | 'admin') => {
-    if (role === 'admin') {
-      setEmail('admin@competition.com');
-      setPassword('admin123');
-    } else if (role === 'judge') {
-      setEmail('judge1@competition.com');
-      setPassword('judge123');
-    } else {
-      setEmail('alice@student.com');
-      setPassword('student123');
-    }
-  };
+
 
   return (
     <div className="flex-grow min-h-[90vh] flex flex-col md:flex-row bg-[#05030a]">
@@ -270,25 +259,6 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                {/* Demo Logins */}
-                <div className="pt-4 border-t border-white/[0.04] space-y-2.5">
-                  <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <KeyRound className="h-3.5 w-3.5 text-primary" />
-                    Autofill Demo Roles:
-                  </span>
-                  <div className="grid grid-cols-3 gap-2">
-                    {['student', 'judge', 'admin'].map((role) => (
-                      <button
-                        key={role}
-                        type="button"
-                        onClick={() => fillRole(role as any)}
-                        className="py-1.5 bg-white/[0.02] hover:bg-primary/10 border border-white/[0.06] hover:border-primary/20 text-zinc-300 hover:text-primary rounded-lg text-[10px] font-semibold transition-all uppercase tracking-wide"
-                      >
-                        {role}
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </form>
             )}
           </div>

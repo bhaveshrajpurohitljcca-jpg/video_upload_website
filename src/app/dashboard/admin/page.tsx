@@ -68,9 +68,17 @@ export default function AdminDashboard() {
     try {
       const currentSettings = await db.getSettings();
       setSettings(currentSettings);
+
+      const formatForInput = (dateStr: string) => {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        const tzoffset = d.getTimezoneOffset() * 60000;
+        return new Date(d.getTime() - tzoffset).toISOString().slice(0, 16);
+      };
+
       setSettingsForm({
-        submission_deadline: currentSettings.submission_deadline || '',
-        voting_deadline: currentSettings.voting_deadline || '',
+        submission_deadline: formatForInput(currentSettings.submission_deadline),
+        voting_deadline: formatForInput(currentSettings.voting_deadline),
         video_size_limit_mb: currentSettings.video_size_limit_mb || 50,
         judge_score_min: currentSettings.judge_score_min || 1,
         judge_score_max: currentSettings.judge_score_max || 100,
@@ -247,7 +255,12 @@ export default function AdminDashboard() {
     }
 
     try {
-      await db.updateSettings(settingsForm);
+      const payload = {
+        ...settingsForm,
+        submission_deadline: new Date(settingsForm.submission_deadline).toISOString(),
+        voting_deadline: new Date(settingsForm.voting_deadline).toISOString(),
+      };
+      await db.updateSettings(payload);
       toast.success('Competition settings updated.');
       await loadData();
     } catch (err: any) {

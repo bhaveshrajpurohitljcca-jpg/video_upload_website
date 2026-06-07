@@ -105,162 +105,85 @@ export default function LoginPage() {
           
           <div className="space-y-2">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-              {forgotMode ? 'Reset Password' : 'Sign In'}
+              Sign In
             </h1>
             <p className="text-xs sm:text-sm text-zinc-400 font-light">
-              {forgotMode 
-                ? 'Enter your email to receive a password reset link' 
-                : 'Access student, judge, or admin dashboards'}
+              Access student, judge, or admin dashboards
             </p>
           </div>
 
           <div className="bg-white/[0.01] border border-white/[0.04] rounded-2xl p-6 sm:p-8 space-y-6 backdrop-blur-md">
-            {forgotMode ? (
-              <form onSubmit={handleForgotSubmit} className="space-y-4">
-                {resetSent ? (
-                  <div className="text-center space-y-4 py-4">
-                    <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400">
-                      <Mail className="h-6 w-6" />
-                    </div>
-                    <h3 className="text-sm font-semibold text-white">Check your email</h3>
-                    <p className="text-xs text-zinc-400 leading-relaxed font-light">
-                      We sent a password reset link to <span className="text-zinc-200 font-medium">{resetEmail}</span>. Follow the link to reset your password.
-                    </p>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-4">
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@college.edu"
+                    className="w-full bg-white/[0.02] border border-white/[0.08] focus:border-primary/60 rounded-xl px-4 py-3 text-xs text-white outline-none transition-all focus:bg-white/[0.04] focus:ring-2 focus:ring-primary/10"
+                  />
+                </div>
+
+                {/* Password */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
+                      Password
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="w-full bg-white/[0.02] border border-white/[0.08] focus:border-primary/60 rounded-xl pl-4 pr-10 py-3 text-xs text-white outline-none transition-all focus:bg-white/[0.04] focus:ring-2 focus:ring-primary/10"
+                    />
                     <button
                       type="button"
-                      onClick={() => {
-                        setForgotMode(false);
-                        setResetSent(false);
-                        setResetEmail('');
-                      }}
-                      className="w-full py-2.5 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] text-white rounded-xl text-xs font-semibold transition-colors"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
                     >
-                      Back to Sign In
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
+                </div>
+              </div>
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full btn-primary text-xs font-bold uppercase tracking-wider mt-2"
+              >
+                {loading ? (
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
                 ) : (
                   <>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                        Email Address
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full bg-white/[0.02] border border-white/[0.08] focus:border-violet-500/60 rounded-xl px-4 py-3 text-xs text-white outline-none transition-all focus:bg-white/[0.04] focus:ring-2 focus:ring-violet-500/10"
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-3 pt-2">
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all"
-                      >
-                        {loading ? (
-                          <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <>
-                            Send Reset Link
-                            <ArrowRight className="h-3.5 w-3.5" />
-                          </>
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setForgotMode(false)}
-                        className="text-[11px] text-zinc-500 hover:text-zinc-300 transition-colors text-center mt-1"
-                      >
-                        Cancel
-                      </button>
-                    </div>
+                    Sign In
+                    <ArrowRight className="h-3.5 w-3.5" />
                   </>
                 )}
-              </form>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-4">
-                  {/* Email */}
-                  <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="name@college.edu"
-                      className="w-full bg-white/[0.02] border border-white/[0.08] focus:border-primary/60 rounded-xl px-4 py-3 text-xs text-white outline-none transition-all focus:bg-white/[0.04] focus:ring-2 focus:ring-primary/10"
-                    />
-                  </div>
+              </button>
 
-                  {/* Password */}
-                  <div className="space-y-1.5">
-                    <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">
-                        Password
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setForgotMode(true)}
-                        className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline transition-colors"
-                      >
-                        Forgot password?
-                      </button>
-                    </div>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full bg-white/[0.02] border border-white/[0.08] focus:border-primary/60 rounded-xl pl-4 pr-10 py-3 text-xs text-white outline-none transition-all focus:bg-white/[0.04] focus:ring-2 focus:ring-primary/10"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Login Button */}
-                 <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full btn-primary text-xs font-bold uppercase tracking-wider mt-2"
+              {/* Register Callout */}
+              <div className="text-center text-[11px] text-zinc-500 pt-4 border-t border-white/[0.04] mt-2">
+                New student participant?{' '}
+                <Link
+                  href="/register"
+                  className="font-bold text-primary hover:underline transition-colors"
                 >
-                  {loading ? (
-                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <>
-                      Sign In
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </>
-                  )}
-                </button>
-
-                {/* Register Callout */}
-                <div className="text-center text-[11px] text-zinc-500 pt-4 border-t border-white/[0.04] mt-2">
-                  New student participant?{' '}
-                  <Link
-                    href="/register"
-                    className="font-bold text-primary hover:underline transition-colors"
-                  >
-                    Create account
-                  </Link>
-                </div>
-
-              </form>
-            )}
+                  Create account
+                </Link>
+              </div>
+            </form>
           </div>
         </div>
       </div>

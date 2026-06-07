@@ -343,9 +343,14 @@ export default function HomePage() {
             </span>
           </div>
 
-          <p className="text-xs text-zinc-500">
-            &copy; {new Date().getFullYear()} AI Powered Content Creators Bootcamp. All rights reserved.
-          </p>
+          <div className="text-right space-y-1">
+            <p className="text-xs text-zinc-500">
+              &copy; {new Date().getFullYear()} AI Powered Content Creators Bootcamp. All rights reserved.
+            </p>
+            <p className="text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 tracking-wide uppercase">
+              Created By Bhavesh Rajpurohit
+            </p>
+          </div>
         </div>
       </footer>
     </div>

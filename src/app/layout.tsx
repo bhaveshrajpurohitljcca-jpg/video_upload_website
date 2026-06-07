@@ -30,8 +30,11 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="border-t border-white/5 bg-background py-8 text-center text-xs text-zinc-500">
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-2">
               <p>&copy; {new Date().getFullYear()} AI Powered Content Creators Bootcamp. All rights reserved. Created for College AI Video Innovation Competition.</p>
+              <p className="text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 tracking-wide uppercase">
+                Created By Bhavesh Rajpurohit
+              </p>
             </div>
           </footer>
           <ToastContainer />

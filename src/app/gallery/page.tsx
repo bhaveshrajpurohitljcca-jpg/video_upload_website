@@ -288,7 +288,7 @@ export default function GalleryPage() {
       {/* Video Modal Player (Behance Overlay style) */}
       {selectedVideo && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-fade-in">
-          <div className="bg-[#0b0818] w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl relative border border-white/[0.08] flex flex-col md:flex-row">
+          <div className="bg-[#0b0818] w-full max-w-4xl rounded-2xl overflow-hidden shadow-2xl relative border border-white/[0.08] flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]">
             
             {/* Close */}
             <button
@@ -299,7 +299,7 @@ export default function GalleryPage() {
             </button>
 
             {/* Video Player (60% width) */}
-            <div className="w-full md:w-[60%] bg-black flex items-center justify-center aspect-video md:aspect-auto">
+            <div className="w-full md:w-[60%] bg-black flex items-center justify-center aspect-video md:aspect-auto shrink-0">
               <video
                 src={selectedVideo.video_url}
                 controls
@@ -309,7 +309,7 @@ export default function GalleryPage() {
             </div>
 
             {/* details Sidebar (40% width) */}
-            <div className="w-full md:w-[40%] p-6 sm:p-8 flex flex-col justify-between bg-[#0e0a20] border-l border-white/[0.04]">
+            <div className="w-full md:w-[40%] p-6 sm:p-8 flex flex-col justify-between bg-[#0e0a20] border-l border-white/[0.04] flex-1 overflow-y-auto">
               <div className="space-y-6">
                 <div>
                   <span className="bg-primary/10 border border-primary/20 px-2.5 py-0.5 rounded text-[9px] font-bold text-primary uppercase tracking-wide">
@@ -345,8 +345,8 @@ export default function GalleryPage() {
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-[10px] text-zinc-500 border-t border-white/[0.03] pt-2">
-                  <div>Student Stars: {selectedVideo.student_stars || 0} (×10 pts)</div>
-                  <div>Judge Stars: {selectedVideo.judge_stars || 0} (×30)</div>
+                  <div>Student Stars: {selectedVideo.student_stars || 0}</div>
+                  <div>Judge Stars: {selectedVideo.judge_stars || 0}</div>
                 </div>
 
                 {user ? (
@@ -378,7 +378,7 @@ export default function GalleryPage() {
                             onClick={() => handleVote(selectedVideo.id, ratingStars)}
                             className="w-full py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs flex items-center justify-center gap-1.5 transition-all font-bold rounded-xl"
                           >
-                            Submit Star Rating ({ratingStars * 10} pts)
+                            Submit Star Rating
                           </button>
                         </div>
                       );

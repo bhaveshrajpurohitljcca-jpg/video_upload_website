@@ -111,7 +111,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-base sm:text-lg text-zinc-400 max-w-2xl mx-auto font-light leading-relaxed">
-            Design, direct, and deploy a 2-minute short film leveraging cutting-edge generative AI models. Pitch your creation, secure public votes, and impress the jury.
+            Design, direct, and deploy a 1-minute short film leveraging cutting-edge generative AI models. Pitch your creation, secure public votes, and impress the jury.
           </p>
 
           {/* Countdown & CTA Controls */}
@@ -242,7 +242,7 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
             {[
               { step: '01', title: 'Register Account', desc: 'Create your account using your name and email to secure access credentials.' },
-              { step: '02', title: 'Create AI Video', desc: 'Utilize generative tools like Runway, Midjourney, or Elevenlabs to build your 2-minute project.' },
+              { step: '02', title: 'Create AI Video', desc: 'Utilize generative tools like Runway, Midjourney, or Elevenlabs to build your 1-minute project.' },
               { step: '03', title: 'Upload & Describe', desc: 'Submit your MP4 file. Declare the complete AI tools stack and cinematic prompt outline.' },
               { step: '04', title: 'Vote & Win', desc: 'Promote your project in the public gallery. Collect peer votes and present to judges.' },
             ].map((item, idx) => (
@@ -339,7 +339,7 @@ export default function HomePage() {
               <Video className="h-4 w-4 text-white" />
             </div>
             <span className="text-xs font-extrabold uppercase text-white tracking-widest">
-              Creators<span className="text-violet-500">Bootcamp</span>
+              Creators <span className="text-violet-500">Bootcamp</span>
             </span>
           </div>
 

@@ -45,7 +45,7 @@ export const Navbar = () => {
                 <Video className="h-5 w-5 text-black" />
               </div>
               <span className="text-sm font-extrabold tracking-widest text-white uppercase font-heading">
-                Creators<span className="text-primary">Bootcamp</span>
+                Creators <span className="text-primary">Bootcamp</span>
               </span>
             </Link>
           </div>

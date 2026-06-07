@@ -89,8 +89,8 @@ export default function StudentDashboard() {
     tempVideo.src = objectUrl;
     tempVideo.preload = 'metadata';
     tempVideo.onloadedmetadata = () => {
-      if (tempVideo.duration > 120) {
-        toast.error(`Video duration (${tempVideo.duration.toFixed(1)}s) exceeds the 2-minute limit.`);
+      if (tempVideo.duration > 60) {
+        toast.error(`Video duration (${tempVideo.duration.toFixed(1)}s) exceeds the 1-minute limit.`);
         setVideoFile(null);
         setVideoPreviewUrl('');
         e.target.value = '';
@@ -503,7 +503,7 @@ export default function StudentDashboard() {
                             ) : (
                               <div className="space-y-1">
                                 <p className="text-xs font-semibold text-zinc-300">Choose a video file or drag here</p>
-                                <p className="text-[10px] text-zinc-500 font-light">MP4 or WebM formats capped at {settings?.video_size_limit_mb ?? 50} MB (Max 2 Mins)</p>
+                                <p className="text-[10px] text-zinc-500 font-light">MP4 or WebM formats capped at {settings?.video_size_limit_mb ?? 50} MB (Max 1 Min)</p>
                               </div>
                             )}
                           </div>

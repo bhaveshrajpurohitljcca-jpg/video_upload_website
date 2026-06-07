@@ -58,7 +58,7 @@ export default function RegisterPage() {
             <Video className="h-5 w-5 text-white" />
           </div>
           <span className="text-sm font-extrabold uppercase tracking-widest text-white">
-            Creators<span className="text-violet-500">Bootcamp</span>
+            Creators <span className="text-violet-500">Bootcamp</span>
           </span>
         </Link>
 
@@ -83,7 +83,7 @@ export default function RegisterPage() {
         <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05] text-[10px] text-zinc-400 z-10 max-w-sm">
           <span className="font-semibold text-violet-300 block mb-1">Creator Account Benefits:</span>
           <ul className="list-disc pl-3.5 space-y-1">
-            <li>Submit 2-minute generative AI video entries.</li>
+            <li>Submit 1-minute generative AI video entries.</li>
             <li>Vote for peer submissions in the live gallery.</li>
             <li>Get scored and reviewed by expert jury members.</li>
           </ul>

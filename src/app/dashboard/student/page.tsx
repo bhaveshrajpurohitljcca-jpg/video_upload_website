@@ -24,7 +24,7 @@ export default function StudentDashboard() {
   const [settings, setSettings] = useState<any>(null);
   const [themes, setThemes] = useState<any[]>([]);
   const [submission, setSubmission] = useState<any | null>(null);
-  const [voteRecord, setVoteRecord] = useState<any | null>(null);
+  const [voteRecords, setVoteRecords] = useState<any[]>([]);
   
   // Upload form states
   const [title, setTitle] = useState('');
@@ -59,8 +59,8 @@ export default function StudentDashboard() {
         const sub = await db.getSubmissionByStudent(user.id);
         setSubmission(sub);
         
-        const vote = await db.getVoteByStudent(user.id);
-        setVoteRecord(vote);
+        const votes = await db.getVotesByStudent(user.id);
+        setVoteRecords(votes);
       } catch (err) {
         console.error('Failed to load student dashboard data:', err);
       }
@@ -293,28 +293,26 @@ export default function StudentDashboard() {
               <div className="bg-white/[0.01] border border-white/[0.04] rounded-2xl p-6 space-y-4">
                 <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Jury & Peer Review</span>
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-white">Public Cast Vote</h3>
+                  <h3 className="text-sm font-bold text-white">Public Star Ratings</h3>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded border uppercase ${
-                    voteRecord 
-                      ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400' 
+                    voteRecords.length > 0 
+                      ? 'bg-violet-500/10 border-violet-500/25 text-violet-400' 
                       : 'bg-zinc-500/10 border-zinc-500/25 text-zinc-400'
                   }`}>
-                    {voteRecord ? 'Cast Registered' : 'Not Cast'}
+                    {voteRecords.length > 0 ? `${voteRecords.length} Rated` : 'No Ratings'}
                   </span>
                 </div>
                 <p className="text-xs text-zinc-400 leading-relaxed font-light">
-                  {voteRecord 
-                    ? 'Your peer vote has been recorded in the database ledger.' 
-                    : 'Explore the student submissions gallery to discover creative ideas and cast your single vote.'}
+                  {voteRecords.length > 0 
+                    ? `You have rated ${voteRecords.length} video projects in the gallery index.` 
+                    : 'Explore the student submissions gallery to discover creative ideas and rate multiple entries.'}
                 </p>
-                {!voteRecord && (
-                  <Link 
-                    href="/gallery" 
-                    className="py-1.5 px-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] text-zinc-300 hover:text-white rounded-lg text-xs font-semibold transition-colors inline-block text-center"
-                  >
-                    Browse Gallery
-                  </Link>
-                )}
+                <Link 
+                  href="/gallery" 
+                  className="py-1.5 px-4 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] text-zinc-300 hover:text-white rounded-lg text-xs font-semibold transition-colors inline-block text-center"
+                >
+                  Browse Gallery
+                </Link>
               </div>
             </div>
           </div>
@@ -536,23 +534,40 @@ export default function StudentDashboard() {
             </div>
 
             <div className="bg-white/[0.01] border border-white/[0.04] rounded-2xl p-6 sm:p-8 space-y-6">
-              {voteRecord ? (
-                <div className="space-y-4 text-center py-6">
-                  <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <CheckCircle2 className="h-7 w-7" />
+              {voteRecords.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="p-4 rounded-xl bg-violet-600/10 border border-violet-500/20 text-xs text-zinc-300 leading-relaxed font-light">
+                    <strong>Multiple Ratings Allowed:</strong> You can rate multiple different videos in the Gallery using the star system (1-5 stars).
                   </div>
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-bold text-white">Vote Cast Registered</h3>
-                    <p className="text-xs text-zinc-400 font-light">Your single vote allocation has been recorded on the database ledger.</p>
+                  <div className="space-y-3">
+                    <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Your Rated Videos</h3>
+                    <div className="divide-y divide-white/[0.04] space-y-3">
+                      {voteRecords.map((voteRecord) => (
+                        <div key={voteRecord.id} className="flex justify-between items-center pt-3 text-xs">
+                          <div>
+                            <span className="text-zinc-500 font-mono text-[10px] block">RATED ON: {new Date(voteRecord.created_at).toLocaleDateString()}</span>
+                            <span className="font-semibold text-zinc-200">Video ID: {voteRecord.submission_id}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-amber-400 font-bold">
+                            {voteRecord.stars} ★
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-[10px] text-zinc-500 font-mono">
-                    Cast Timestamp: {new Date(voteRecord.created_at).toLocaleString()}
-                  </p>
+                  <div className="pt-4 text-center">
+                    <Link 
+                      href="/gallery" 
+                      className="py-2.5 px-6 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-xs font-semibold rounded-xl inline-block"
+                    >
+                      Rate More Videos in Gallery
+                    </Link>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-4">
                   <p className="text-xs text-zinc-400 leading-relaxed font-light">
-                    You have not registered your vote yet. Choose a video project in the gallery index page and click "Cast My Single Vote".
+                    You have not rated any video projects yet. Choose a video project in the gallery index page and give it a star rating (1-5 stars).
                   </p>
                   <Link 
                     href="/gallery" 

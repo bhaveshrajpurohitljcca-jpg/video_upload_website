@@ -14,12 +14,12 @@ export default function GalleryPage() {
   const [themes, setThemes] = useState<any[]>([]);
   const [search, setSearch] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('all');
-  const [sortBy, setSortBy] = useState<'newest' | 'votes'>('newest');
+  const [sortBy, setSortBy] = useState<'newest' | 'votes'>('votes');
   const [selectedVideo, setSelectedVideo] = useState<any | null>(null);
   
   // Voting states
-  const [hasVoted, setHasVoted] = useState(false);
-  const [studentVote, setStudentVote] = useState<any | null>(null);
+  const [studentVotes, setStudentVotes] = useState<any[]>([]);
+  const [ratingStars, setRatingStars] = useState<number>(5);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -33,9 +33,8 @@ export default function GalleryPage() {
       setThemes(allThemes.filter(t => t.active));
 
       if (user && user.role === 'student') {
-        const vote = await db.getVoteByStudent(user.id);
-        setHasVoted(!!vote);
-        setStudentVote(vote);
+        const votes = await db.getVotesByStudent(user.id);
+        setStudentVotes(votes);
       }
     } catch (err) {
       console.error('Failed to load gallery data:', err);
@@ -46,9 +45,9 @@ export default function GalleryPage() {
     loadGalleryData();
   }, [user]);
 
-  const handleVote = async (submissionId: string) => {
+  const handleVote = async (submissionId: string, stars: number) => {
     if (!user) {
-      toast.error('You must sign in as a student to vote.');
+      toast.error('You must sign in as a student to rate.');
       return;
     }
     if (user.role !== 'student') {
@@ -57,8 +56,8 @@ export default function GalleryPage() {
     }
 
     try {
-      await db.castVote(user.id, submissionId);
-      toast.success('Your vote has been cast successfully!');
+      await db.castVote(user.id, submissionId, stars);
+      toast.success('Your rating has been submitted successfully!');
       
       confetti({
         particleCount: 100,
@@ -79,7 +78,7 @@ export default function GalleryPage() {
         });
       }
     } catch (err: any) {
-      toast.error(err.message || 'Failed to submit vote.');
+      toast.error(err.message || 'Failed to submit rating.');
     }
   };
 
@@ -105,7 +104,7 @@ export default function GalleryPage() {
 
     // Sort order
     if (sortBy === 'votes') {
-      list.sort((a, b) => b.vote_count - a.vote_count);
+      list.sort((a, b) => b.total_points - a.total_points);
     } else {
       list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
@@ -248,9 +247,8 @@ export default function GalleryPage() {
                       <Clock className="h-3.5 w-3.5 text-zinc-500" />
                       {formatDate(sub.created_at)}
                     </span>
-                    <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 border border-primary/20 text-primary font-bold">
-                      <Vote className="h-3 w-3" />
-                      {sub.vote_count} votes
+                    <span className="flex items-center gap-1 rounded-full bg-violet-500/10 px-2.5 py-1 border border-violet-500/20 text-violet-400 font-bold">
+                      ★ {sub.total_points || 0} pts
                     </span>
                   </div>
                 </div>
@@ -340,38 +338,54 @@ export default function GalleryPage() {
 
               {/* Voting box */}
               <div className="pt-6 border-t border-white/[0.05] mt-6 space-y-4">
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-zinc-400 font-semibold">Public Standing</span>
-                  <span className="text-xs font-bold text-primary flex items-center gap-1.5 bg-primary/10 border border-primary/20 px-3 py-1 rounded-full">
-                    <Vote className="h-4 w-4 text-primary" />
-                    {selectedVideo.vote_count} votes
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-zinc-400 font-semibold">Total Points Score</span>
+                  <span className="font-bold text-amber-400 flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-3 py-1 rounded-full animate-pulse">
+                    ★ {selectedVideo.total_points || 0} pts
                   </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-[10px] text-zinc-500 border-t border-white/[0.03] pt-2">
+                  <div>Student Stars: {selectedVideo.student_stars || 0} (×10 pts)</div>
+                  <div>Judge Stars: {selectedVideo.judge_stars || 0} (×30)</div>
                 </div>
 
                 {user ? (
                   user.role === 'student' ? (
-                    hasVoted ? (
-                      studentVote?.submission_id === selectedVideo.id ? (
-                        <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-3 text-center text-xs font-bold text-emerald-400">
-                          ✓ You voted for this video
+                    (() => {
+                      const existingVote = studentVotes.find(v => v.submission_id === selectedVideo.id);
+                      if (existingVote) {
+                        return (
+                          <div className="rounded-xl bg-emerald-500/5 border border-emerald-500/20 p-3 text-center text-xs font-bold text-emerald-400">
+                            ✓ You rated this video: {existingVote.stars} ★
+                          </div>
+                        );
+                      }
+                      return (
+                        <div className="space-y-3 pt-2">
+                          <div className="flex items-center justify-center gap-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <button
+                                key={star}
+                                type="button"
+                                onClick={() => setRatingStars(star)}
+                                className="text-2xl transition-transform hover:scale-120 focus:outline-none"
+                              >
+                                <span className={star <= ratingStars ? 'text-amber-400' : 'text-zinc-600'}>★</span>
+                              </button>
+                            ))}
+                          </div>
+                          <button
+                            onClick={() => handleVote(selectedVideo.id, ratingStars)}
+                            className="w-full py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xs flex items-center justify-center gap-1.5 transition-all font-bold rounded-xl"
+                          >
+                            Submit Star Rating ({ratingStars * 10} pts)
+                          </button>
                         </div>
-                      ) : (
-                        <div className="rounded-xl bg-white/[0.02] border border-white/[0.06] p-3 text-center text-xs text-zinc-500">
-                          Your single public vote is registered
-                        </div>
-                      )
-                    ) : (
-                      <button
-                        onClick={() => handleVote(selectedVideo.id)}
-                        className="w-full py-2.5 btn-primary text-xs flex items-center justify-center gap-1.5 transition-all font-bold"
-                      >
-                        <Vote className="h-4 w-4" />
-                        Cast My Single Vote
-                      </button>
-                    )
+                      );
+                    })()
                   ) : (
                     <div className="rounded-xl bg-white/[0.02] border border-white/[0.05] p-3 text-center text-xs text-zinc-500">
-                      Evaluator Role ({user.role}) cannot vote in public gallery.
+                      Evaluator Role ({user.role}) cannot rate in public gallery.
                     </div>
                   )
                 ) : (

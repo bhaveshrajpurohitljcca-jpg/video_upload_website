@@ -63,9 +63,11 @@ alter table public.submissions enable row level security;
 -- Create votes table
 create table public.votes (
   id uuid default gen_random_uuid() primary key,
-  voter_student_id uuid references public.student_profiles(id) on delete cascade unique,
+  voter_student_id uuid references public.student_profiles(id) on delete cascade not null,
   submission_id uuid references public.submissions(id) on delete cascade not null,
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+  stars integer default 5 check (stars >= 1 and stars <= 5) not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  constraint unique_student_submission_vote unique (voter_student_id, submission_id)
 );
 
 alter table public.votes enable row level security;
@@ -138,17 +140,30 @@ create trigger on_judge_delete
   after delete on public.judges
   for each row execute procedure public.handle_judge_delete();
 
--- Trigger to create a public.users row on auth.users sign up
+-- Trigger to create a public.users row and profiles on auth.users sign up
 create or replace function public.handle_new_user()
 returns trigger as $$
 declare
   user_role text;
+  full_name text;
 begin
   -- Role metadata is passed in user_metadata during sign up
   user_role := coalesce(new.raw_user_meta_data->>'role', 'student');
+  full_name := coalesce(new.raw_user_meta_data->>'name', 'Student');
   
   insert into public.users (id, email, role)
-  values (new.id, new.email, user_role);
+  values (new.id, new.email, user_role)
+  on conflict (id) do update set email = excluded.email, role = excluded.role;
+
+  if user_role = 'student' then
+    insert into public.student_profiles (id, name, email)
+    values (new.id, full_name, new.email)
+    on conflict (id) do update set name = excluded.name, email = excluded.email;
+  elsif user_role = 'judge' then
+    insert into public.judges (id, name, email, active)
+    values (new.id, full_name, new.email, true)
+    on conflict (id) do update set name = excluded.name, email = excluded.email;
+  end if;
   
   return new;
 end;

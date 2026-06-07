@@ -104,6 +104,7 @@ const DEFAULT_VOTES = [
     id: 'v_1',
     voter_student_id: 'std_2',
     submission_id: 'sub_1',
+    stars: 5,
     created_at: new Date().toISOString()
   }
 ];
@@ -113,7 +114,7 @@ const DEFAULT_JUDGE_SCORES = [
     id: 'sc_1',
     judge_id: 'j1',
     submission_id: 'sub_1',
-    score: 88,
+    score: 4,
     comments: 'Cinematic layout is stunning. Seamless AI voice synthesis.',
     created_at: new Date().toISOString()
   },
@@ -121,7 +122,7 @@ const DEFAULT_JUDGE_SCORES = [
     id: 'sc_2',
     judge_id: 'j2',
     submission_id: 'sub_1',
-    score: 92,
+    score: 5,
     comments: 'Excellent prompt mastery and flow. Masterfully done!',
     created_at: new Date().toISOString()
   },
@@ -129,7 +130,7 @@ const DEFAULT_JUDGE_SCORES = [
     id: 'sc_3',
     judge_id: 'j1',
     submission_id: 'sub_2',
-    score: 75,
+    score: 3,
     comments: 'Good graphics and editing. Voice has slight robotic artifacts.',
     created_at: new Date().toISOString()
   }
@@ -301,7 +302,7 @@ export const db = {
       if (authError) throw new Error(authError.message);
       if (!authData.user) throw new Error('Failed to create judge auth user.');
 
-      const { data: judgeData, error: judgeError } = await supabase.from('judges').insert({
+      const { data: judgeData, error: judgeError } = await supabase.from('judges').upsert({
         id: authData.user.id,
         name: judge.name,
         email: judge.email,
@@ -444,21 +445,22 @@ export const db = {
     return getStorageItem<any[]>('comp_votes', DEFAULT_VOTES);
   },
 
-  async getVoteByStudent(studentId: string) {
+  async getVotesByStudent(studentId: string) {
     if (isSupabaseConfigured && supabase) {
-      const { data, error } = await supabase.from('votes').select('*').eq('voter_student_id', studentId).maybeSingle();
+      const { data, error } = await supabase.from('votes').select('*').eq('voter_student_id', studentId);
       if (!error && data) return data;
-      return null;
+      return [];
     }
     const votes = await this.getVotes();
-    return votes.find(v => v.voter_student_id === studentId) || null;
+    return votes.filter(v => v.voter_student_id === studentId);
   },
 
-  async castVote(voterStudentId: string, submissionId: string) {
+  async castVote(voterStudentId: string, submissionId: string, stars: number) {
     if (isSupabaseConfigured && supabase) {
       const { data, error } = await supabase.from('votes').insert({
         voter_student_id: voterStudentId,
-        submission_id: submissionId
+        submission_id: submissionId,
+        stars: stars
       }).select().single();
       if (error) throw new Error(error.message);
       return data;
@@ -466,9 +468,9 @@ export const db = {
 
     const votes = await this.getVotes();
     
-    const existing = votes.find(v => v.voter_student_id === voterStudentId);
+    const existing = votes.find(v => v.voter_student_id === voterStudentId && v.submission_id === submissionId);
     if (existing) {
-      throw new Error('You have already cast your vote. Votes are limited to one per student and cannot be changed.');
+      throw new Error('You have already rated this video.');
     }
 
     const settings = await this.getSettings();
@@ -480,6 +482,7 @@ export const db = {
       id: 'vote_' + Math.random().toString(36).substring(2, 9),
       voter_student_id: voterStudentId,
       submission_id: submissionId,
+      stars: stars,
       created_at: new Date().toISOString()
     };
     votes.push(newVote);
@@ -542,55 +545,54 @@ export const db = {
     const submissions = await this.getSubmissions();
     const votes = await this.getVotes();
     const judgeScores = await this.getJudgeScores();
-    const settings = await this.getSettings();
     const profiles = await this.getRegisteredStudents();
     const themes = await this.getThemes();
 
-    const votesMap: Record<string, number> = {};
+    const votesMap: Record<string, { total_stars: number; count: number }> = {};
     votes.forEach(v => {
-      votesMap[v.submission_id] = (votesMap[v.submission_id] || 0) + 1;
+      if (!votesMap[v.submission_id]) {
+        votesMap[v.submission_id] = { total_stars: 0, count: 0 };
+      }
+      votesMap[v.submission_id].total_stars += Number(v.stars || 5);
+      votesMap[v.submission_id].count += 1;
     });
 
-    const judgeScoresMap: Record<string, { total: number; count: number }> = {};
+    const judgeScoresMap: Record<string, { total_stars: number; count: number }> = {};
     judgeScores.forEach(js => {
       if (!judgeScoresMap[js.submission_id]) {
-        judgeScoresMap[js.submission_id] = { total: 0, count: 0 };
+        judgeScoresMap[js.submission_id] = { total_stars: 0, count: 0 };
       }
-      judgeScoresMap[js.submission_id].total += Number(js.score);
+      judgeScoresMap[js.submission_id].total_stars += Number(js.score || 5);
       judgeScoresMap[js.submission_id].count += 1;
     });
-
-    const maxVotes = Math.max(...Object.values(votesMap), 1);
-    const maxJudgeScore = settings.judge_score_max;
 
     const scoredSubmissions = submissions.map(sub => {
       const student = profiles.find(p => p.id === sub.student_id);
       const theme = themes.find(t => t.id === sub.theme_id);
       
-      const voteCount = votesMap[sub.id] || 0;
-      const normalizedPublicScore = (voteCount / maxVotes) * 100;
+      const studVote = votesMap[sub.id] || { total_stars: 0, count: 0 };
+      const jgScore = judgeScoresMap[sub.id] || { total_stars: 0, count: 0 };
 
-      const js = judgeScoresMap[sub.id];
-      const avgJudgeScore = js ? (js.total / js.count) : 0;
-      const normalizedJudgeScore = (avgJudgeScore / maxJudgeScore) * 100;
-
-      const finalScore = (
-        (normalizedJudgeScore * settings.judge_score_weight) +
-        (normalizedPublicScore * settings.public_vote_weight)
-      ) / 100;
+      // Each student star is worth 10 points. Each judge star is worth 30 points.
+      const studentPoints = studVote.total_stars * 10;
+      const judgePoints = jgScore.total_stars * 30;
+      const totalPoints = studentPoints + judgePoints;
 
       return {
         ...sub,
         student_name: student ? student.name : 'Unknown Student',
         theme_name: theme ? theme.name : 'Unknown Theme',
-        vote_count: voteCount,
-        avg_judge_score: avgJudgeScore.toFixed(1),
-        judge_score_count: js ? js.count : 0,
-        final_score: finalScore.toFixed(2)
+        vote_count: studVote.count,
+        student_stars: studVote.total_stars,
+        judge_stars: jgScore.total_stars,
+        final_score: totalPoints.toString(),
+        total_points: totalPoints,
+        avg_judge_score: jgScore.count > 0 ? (jgScore.total_stars / jgScore.count).toFixed(1) : '0.0',
+        judge_score_count: jgScore.count
       };
     });
 
-    return scoredSubmissions.sort((a, b) => Number(b.final_score) - Number(a.final_score));
+    return scoredSubmissions.sort((a, b) => b.total_points - a.total_points);
   },
 
   // AUTHENTICATION
@@ -601,15 +603,27 @@ export const db = {
       const user = session.user;
 
       const { data: publicUser } = await supabase.from('users').select('role').eq('id', user.id).single();
-      const role = publicUser?.role || 'student';
+      if (!publicUser) {
+        await supabase.auth.signOut();
+        return null;
+      }
+      const role = publicUser.role;
       let detailedUser: any = { id: user.id, email: user.email, role };
 
       if (role === 'student') {
         const { data: profile } = await supabase.from('student_profiles').select('*').eq('id', user.id).single();
-        if (profile) detailedUser = { ...detailedUser, ...profile };
+        if (!profile) {
+          await supabase.auth.signOut();
+          return null;
+        }
+        detailedUser = { ...detailedUser, ...profile };
       } else if (role === 'judge') {
         const { data: judge } = await supabase.from('judges').select('*').eq('id', user.id).single();
-        if (judge) detailedUser = { ...detailedUser, name: judge.name };
+        if (!judge) {
+          await supabase.auth.signOut();
+          return null;
+        }
+        detailedUser = { ...detailedUser, name: judge.name };
       }
       return detailedUser;
     }
@@ -684,7 +698,7 @@ export const db = {
       if (error) throw new Error(error.message);
       if (!data.user) throw new Error('Registration failed.');
 
-      const { error: profileError } = await supabase.from('student_profiles').insert({
+      const { error: profileError } = await supabase.from('student_profiles').upsert({
         id: data.user.id,
         name: studentData.name,
         email: studentData.email

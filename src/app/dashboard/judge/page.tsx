@@ -42,9 +42,8 @@ export default function JudgeDashboard() {
       const scores = allScores.filter(s => s.judge_id === user.id);
       setJudgeScores(scores);
 
-      // Default the slider to midpoint of the configured range
-      const mid = Math.round((compSettings.judge_score_min + compSettings.judge_score_max) / 2);
-      setScore(mid);
+      // Default to 5 stars
+      setScore(5);
     } catch (err) {
       console.error('Failed to load judge dashboard data:', err);
     }
@@ -70,8 +69,7 @@ export default function JudgeDashboard() {
       setScore(Number(existingScore.score));
       setComments(existingScore.comments || '');
     } else {
-      const mid = Math.round(((settings?.judge_score_min || 1) + (settings?.judge_score_max || 100)) / 2);
-      setScore(mid);
+      setScore(5);
       setComments('');
     }
   };
@@ -234,24 +232,24 @@ export default function JudgeDashboard() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-end">
                       <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
-                        Numeric Score ({settings?.judge_score_min || 1}-{settings?.judge_score_max || 100})
+                        Jury Star Rating (1-5 Stars)
                       </label>
                       <span className="text-3xl font-black text-white font-mono leading-none">
-                        {score}
+                        {score} ★
                       </span>
                     </div>
                     <input
                       type="range"
-                      min={settings?.judge_score_min || 1}
-                      max={settings?.judge_score_max || 100}
+                      min={1}
+                      max={5}
                       step={1}
                       value={score}
                       onChange={(e) => setScore(Number(e.target.value))}
                       className="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-violet-600"
                     />
                     <div className="flex justify-between text-[9px] text-zinc-500 font-semibold uppercase">
-                      <span>MIN: {settings?.judge_score_min || 1}</span>
-                      <span>MAX: {settings?.judge_score_max || 100}</span>
+                      <span>MIN: 1 Star</span>
+                      <span>MAX: 5 Stars</span>
                     </div>
                   </div>
 

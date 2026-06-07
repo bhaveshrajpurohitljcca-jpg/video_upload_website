@@ -151,7 +151,9 @@ export default function StudentDashboard() {
           'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4'
         ];
         const randomStockVideo = stockVideos[Math.floor(Math.random() * stockVideos.length)];
-        videoUrl = videoPreviewUrl || randomStockVideo;
+        // Do not use local blob URL (videoPreviewUrl) as other users cannot load/see it.
+        // Use a valid, hosted online stock video instead.
+        videoUrl = randomStockVideo;
 
         const stockThumbs = [
           'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=600&q=80',

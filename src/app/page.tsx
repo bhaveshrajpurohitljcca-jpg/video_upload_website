@@ -330,29 +330,6 @@ export default function HomePage() {
           )}
         </div>
       </section>
-
-      {/* SECTION 6: FOOTER */}
-      <footer className="bg-[#04020a] border-t border-white/[0.03] py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-violet-600 to-fuchsia-500 flex items-center justify-center">
-              <Video className="h-4 w-4 text-white" />
-            </div>
-            <span className="text-xs font-extrabold uppercase text-white tracking-widest">
-              Creators <span className="text-violet-500">Bootcamp</span>
-            </span>
-          </div>
-
-          <div className="text-right space-y-1">
-            <p className="text-xs text-zinc-500">
-              &copy; {new Date().getFullYear()} AI Powered Content Creators Bootcamp. All rights reserved.
-            </p>
-            <p className="text-sm font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-fuchsia-400 tracking-wide uppercase">
-              Created By Bhavesh Rajpurohit
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background: #06050b;
+  --foreground: #f8f9fa;
+  --card: #0c0a18;
+  --card-foreground: #f8f9fa;
+  --popover: #0c0a18;
+  --popover-foreground: #f8f9fa;
+  --primary: #c5ff4c; /* Neon Lime */
+  --primary-foreground: #06050b;
+  --secondary: #141226;
+  --secondary-foreground: #f8f9fa;
+  --muted: #141226;
+  --muted-foreground: #9ca3af;
+  --accent: #d946ef; /* Neon Pink/Fuchsia */
+  --accent-foreground: #ffffff;
+  --destructive: #ff4a7d;
+  --destructive-foreground: #ffffff;
+  --border: rgba(255, 255, 255, 0.05);
+  --input: rgba(255, 255, 255, 0.03);
+  --ring: #c5ff4c;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(197, 255, 76, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(217, 70, 239, 0.05) 0%, transparent 40%);
+  background-attachment: fixed;
+}
+
+/* Headings modern style */
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+/* Glassmorphism utility card - Gen Z version */
+.glass-card {
+  background: rgba(12, 10, 24, 0.45);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(197, 255, 76, 0.2);
+  box-shadow: 0 16px 48px 0 rgba(197, 255, 76, 0.04);
+  transform: translateY(-2px);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  color: white;
+  padding: 12px 16px;
+  outline: none;
+  font-size: 0.825rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-input:focus {
+  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 0 0 2px rgba(197, 255, 76, 0.15);
+}
+
+/* Neon glow buttons - Gen Z version */
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 700;
+  font-size: 0.825rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 12px;
+  padding: 12px 24px;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(197, 255, 76, 0.15);
+  border: 1px solid rgba(197, 255, 76, 0.2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  transform: scale(1.02) translateY(-1px);
+  box-shadow: 0 8px 30px rgba(197, 255, 76, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.03);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+  font-size: 0.825rem;
+  border-radius: 12px;
+  padding: 12px 24px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #06050b;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
